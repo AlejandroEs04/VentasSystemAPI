@@ -4,7 +4,7 @@ using VentasSystemAPI.Models;
 
 namespace VentasSystemAPI.Repositories
 {
-    public class ClientRepository(ApiDbContext context) : GenericRepository<Client>(context), IClientRepository
+    public class CategoryRepository(ApiDbContext context) : GenericRepository<Category>(context), ICategoryRepository
     {
     }
 }
