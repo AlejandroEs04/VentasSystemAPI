@@ -22,40 +22,58 @@ namespace VentasSystemAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
-            Product product = await _service.Get(id);
-            return Ok(product);
+            try
+            {
+                Product product = await _service.Get(id);
+                return Ok(product);
+            }
+            catch (ArgumentException)
+            {
+                return NotFound("Producto no fue encontrado");
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromForm] CreateProductFormDto form)
+        public async Task<IActionResult> CreateProduct(ProductDto model)
         {
-            var dto = JsonSerializer.Deserialize<ProductDto>(form.dto)
-                ?? throw new Exception("Error al recibir producto");
-
-            string urlImage = "";
-            string fileName = "";
-
-            if (form.File != null && form.File.Length > 0)
-            {
-                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                string extension = Path.GetExtension(form.File.FileName);
-                fileName = $"{Guid.NewGuid()}{extension}";
-                string fullPath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(fullPath, FileMode.Create))
-                {
-                    await form.File.CopyToAsync(stream);
-                }
-
-                string baseUrl = $"{Request.Scheme}://{Request.Host}";
-                urlImage = $"{baseUrl}/images/products/{fileName}";
-            }
-
-            Product createdProduct = await _service.Add(dto, urlImage, fileName);
+            Product createdProduct = await _service.Add(model);
             return Ok(createdProduct);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(ProductDto model, int id)
+        {
+            try
+            {
+                Product updatedProduct = await _service.Update(model, id);
+                return Ok(updatedProduct);
+            }
+            catch (ArgumentException)
+            {
+                return NotFound("Producto no fue encontrado");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Hubo un error el servidor");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            try
+            {
+                await _service.Delete(id);
+                return NoContent();
+            }
+            catch(ArgumentException)
+            {
+                return NotFound("Producto no fue encontrado");
+            }
+            catch(Exception)
+            {
+                return BadRequest("Hubo un error el servidor");
+            }
         }
     }
 }

@@ -7,8 +7,8 @@ namespace VentasSystemAPI.Services
     {
         Task<IEnumerable<Product>> GetAll();
         Task<Product> Get(int id);
-        Task<Product> Add(ProductDto product, string urlImage = "", string nameImage = "");
-        Task<Product> Update(ProductDto product, int id, string urlImage = "", string nameImage = "");
+        Task<Product> Add(ProductDto product);
+        Task<Product> Update(ProductDto product, int id);
         Task<bool> Delete(int id);
     }
 }

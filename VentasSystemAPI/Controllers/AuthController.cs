@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
 using VentasSystemAPI.Services;
@@ -33,7 +34,7 @@ namespace VentasSystemAPI.Controllers
             }
         }
 
-        [HttpPost("forgot-password")]
+        [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
             User user = await _service.GetByEmail(dto.Correo);
@@ -55,6 +56,18 @@ namespace VentasSystemAPI.Controllers
                 EsActivo = user.EsActivo
             }, user.IdUsuario);
             return Ok("Clave restablecida con éxito");
+        }
+
+        [HttpGet("RefreshToken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            string userId = User.FindFirst("userId")?.Value + "";
+
+            User user = await _service.Get(int.Parse(userId));
+
+            return Ok(new Dictionary<string, string> {
+                {"token", _securityService.CreateToken(user.IdUsuario)}
+            });
         }
     }
 }

@@ -18,7 +18,7 @@ namespace VentasSystemAPI.Services
             return await _repository.Get(id);
         }
 
-        public async Task<Product> Add(ProductDto dto, string urlImage = "", string nameImage = "")
+        public async Task<Product> Add(ProductDto dto)
         {
 
             var productExists = await _repository.GetByBarCode(dto.CodigoBarra);
@@ -45,13 +45,13 @@ namespace VentasSystemAPI.Services
                 ValorImpuesto = dto.ValorImpuesto,
                 TipoImpuesto = dto.TipoImpuesto,
                 Descuento = dto.Descuento,
-                NombreImagen = nameImage, 
-                UrlImagen = urlImage
+                NombreImagen = dto.NombreImagen, 
+                UrlImagen = dto.UrlImagen
             };
             return await _repository.Add(entity);
         }
 
-        public async Task<Product> Update(ProductDto dto, int id, string urlImage = "", string nameImage = "")
+        public async Task<Product> Update(ProductDto dto, int id)
         {
             var entity = new Product
             {
@@ -75,10 +75,10 @@ namespace VentasSystemAPI.Services
                 Descuento = dto.Descuento
             };
 
-            if (!string.IsNullOrEmpty(urlImage) && !string.IsNullOrEmpty(nameImage))
+            if (!string.IsNullOrEmpty(dto.UrlImagen) && !string.IsNullOrEmpty(dto.NombreImagen))
             {
-                entity.UrlImagen = urlImage;
-                entity.NombreImagen = nameImage;
+                entity.UrlImagen = dto.UrlImagen;
+                entity.NombreImagen = dto.NombreImagen;
             }
 
             return await _repository.Update(entity);
