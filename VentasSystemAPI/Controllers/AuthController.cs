@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
@@ -7,6 +8,7 @@ using VentasSystemAPI.Utils;
 
 namespace VentasSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class AuthController(IUserService service, ISecurityService securityService) : ControllerBase
@@ -14,6 +16,7 @@ namespace VentasSystemAPI.Controllers
         private readonly IUserService _service = service;
         private readonly ISecurityService _securityService = securityService;
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -34,6 +37,7 @@ namespace VentasSystemAPI.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
@@ -68,6 +72,14 @@ namespace VentasSystemAPI.Controllers
             return Ok(new Dictionary<string, string> {
                 {"token", _securityService.CreateToken(user.IdUsuario)}
             });
+        }
+
+        [HttpGet("GetAuth")]
+        public async Task<IActionResult> GetAuth()
+        {
+            string userId = User.FindFirst("userId")?.Value + "";
+            User user = await _service.Get(int.Parse(userId));
+            return Ok(user);
         }
     }
 }

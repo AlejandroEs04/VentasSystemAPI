@@ -1,22 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
 using VentasSystemAPI.Services;
 
 namespace VentasSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class CategoryController(ICategoryService service) : ControllerBase
     {
         private readonly ICategoryService _service = service;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IEnumerable<Category>> GetCategories()
         {
             return await _service.GetAll();
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {

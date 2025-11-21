@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VentasSystemAPI.Services;
 
 namespace VentasSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class ClientController(IClientService service) : ControllerBase

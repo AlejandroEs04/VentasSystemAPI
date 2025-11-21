@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using VentasSystemAPI.Models;
 
-namespace VentasSystemAPI.Models
+namespace VentasSystemAPI.Dtos
 {
-    [Table("Venta")]
-    public class Sale
+    public class SaleResponseDto
     {
-        [Key]
         public int IdVenta { get; set; }
         public string NumeroVenta { get; set; } = "";
         public int? IdTipoDocumentoVenta { get; set; }
@@ -17,5 +14,6 @@ namespace VentasSystemAPI.Models
         public DateTime FechaRegistro { get; set; }
         public int IdCliente { get; set; }
         public decimal Descuento { get; set; }
+        public IEnumerable<SaleDetails> Productos { get; set; } = [];
     }
 }

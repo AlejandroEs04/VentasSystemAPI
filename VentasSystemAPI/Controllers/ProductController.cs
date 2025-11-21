@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
@@ -6,12 +7,14 @@ using VentasSystemAPI.Services;
 
 namespace VentasSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class ProductController(IProductService service) : ControllerBase
     {
         private readonly IProductService _service = service;
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
@@ -19,6 +22,7 @@ namespace VentasSystemAPI.Controllers
             return Ok(products);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
