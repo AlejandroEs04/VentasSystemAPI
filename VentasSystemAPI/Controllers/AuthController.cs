@@ -11,10 +11,17 @@ namespace VentasSystemAPI.Controllers
     [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
-    public class AuthController(IUserService service, ISecurityService securityService) : ControllerBase
+    public class AuthController(
+        IUserService service, 
+        ISecurityService securityService, 
+        IConfiguration config, 
+        IEmailService emailService
+    ) : ControllerBase
     {
         private readonly IUserService _service = service;
         private readonly ISecurityService _securityService = securityService;
+        private readonly IConfiguration _config = config;
+        private readonly IEmailService _emailService = emailService;
 
         [AllowAnonymous]
         [HttpPost]
@@ -41,7 +48,9 @@ namespace VentasSystemAPI.Controllers
         [HttpPost("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
         {
-            User user = await _service.GetByEmail(dto.Correo);
+            string password = dto.Clave;
+            User? user = await _service.GetByEmail(dto.Correo);
+
             if (user == null)
             {
                 return NotFound("Correo no registrado");
@@ -59,6 +68,20 @@ namespace VentasSystemAPI.Controllers
                 Clave = dto.Clave,
                 EsActivo = user.EsActivo
             }, user.IdUsuario);
+
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "Templates", "PasswordChanged.html");
+            var htmlContent = await System.IO.File.ReadAllTextAsync(templatePath);
+
+            htmlContent = htmlContent.Replace("@ViewData[\"Correo\"]", user.Correo);
+            htmlContent = htmlContent.Replace("@ViewData[\"Clave\"]", password);
+            htmlContent = htmlContent.Replace("@ViewData[\"Url\"]", _config.GetSection("AppSettings:FRONTEND_URL").Value + "/Acceso");
+
+            await _emailService.SendEmailAsync(
+                user.Correo,
+                "Contraseña cambio correctamente",
+                htmlContent
+            );
+
             return Ok("Clave restablecida con éxito");
         }
 

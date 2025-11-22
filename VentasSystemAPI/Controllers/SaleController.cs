@@ -12,7 +12,7 @@ using QuestPDF.Fluent;
 
 namespace VentasSystemAPI.Controllers
 {
-    [AllowAnonymous]
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class SaleController(
@@ -36,6 +36,45 @@ namespace VentasSystemAPI.Controllers
         {
             IEnumerable<Sale> sales = await _saleRepository.GetAll();
             return Ok(sales);
+        }
+
+        [HttpGet("Report")]
+        public async Task<IActionResult> GetReport(int? month, DateTime? startTime, DateTime? endTime)
+        {
+            IEnumerable<Sale> sales = await _saleRepository.GetAll();
+
+            decimal totalAmount = 0;
+            decimal totalQuantity = 0;
+
+            if(month.HasValue) sales = sales.Where(s => s.FechaRegistro.Month == month);
+
+            if(startTime.HasValue) sales = sales.Where(s => s.FechaRegistro > startTime);
+
+            if(endTime.HasValue) sales = sales.Where(s => s.FechaRegistro < endTime);
+
+            foreach (Sale sale in sales)
+            {
+                IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(sale.IdVenta);
+
+                foreach (SaleDetails detail in saleDetails)
+                {
+                    totalQuantity += detail.Cantidad;
+                }
+
+                totalAmount += sale.Total;
+            }
+
+            int salesQuantity = sales.Count();
+
+            var response = new
+            {
+                TotalAmount = totalAmount,
+                TotalQuantity = totalQuantity,
+                SalesQuantity = salesQuantity,
+                sales
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]

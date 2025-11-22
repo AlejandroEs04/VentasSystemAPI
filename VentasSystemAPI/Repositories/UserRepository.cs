@@ -11,9 +11,9 @@ namespace VentasSystemAPI.Repositories
             return await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo && u.Clave == clave) ?? throw new UnauthorizedAccessException("Credenciales inválidas");
         }
 
-        public async Task<User> GetByEmail(string correo)
+        public async Task<User?> GetByEmail(string correo)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo) ?? throw new UnauthorizedAccessException("Usuario no existe");
+            return await _context.Users.FirstOrDefaultAsync(u => u.Correo == correo);
         }
     }
 }

@@ -22,11 +22,6 @@ namespace VentasSystemAPI.Services
 
         public async Task<User> Add(UserCreateDto dto)
         {
-            if(string.IsNullOrEmpty(dto.Clave))
-            {
-                dto.Clave = _securityService.GeneratePass();
-            }
-
             var entity = new User
             {
                 Nombre = dto.Nombre, 
@@ -35,7 +30,7 @@ namespace VentasSystemAPI.Services
                 IdRol = dto.IdRol, 
                 UrlFoto = dto.UrlFoto, 
                 NombreFoto = dto.NombreFoto,
-                Clave = _securityService.HashPassword(dto.Clave),
+                Clave = dto.Clave,
                 EsActivo = true, 
                 FechaRegistro = DateTime.Now
             };
@@ -73,7 +68,7 @@ namespace VentasSystemAPI.Services
             return await _repository.GetByCredentials(correo, _securityService.HashPassword(clave));
         }
 
-        public async Task<User> GetByEmail(string correo)
+        public async Task<User?> GetByEmail(string correo)
         {
             return await _repository.GetByEmail(correo);
         }
