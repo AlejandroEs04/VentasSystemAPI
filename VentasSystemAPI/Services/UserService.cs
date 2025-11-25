@@ -46,17 +46,18 @@ namespace VentasSystemAPI.Services
             else
                 dto.Clave = _securityService.HashPassword(dto.Clave);
 
-            Console.WriteLine(dto.UrlFoto);
-            Console.WriteLine(dto.Nombre);
-
             currentUser.Nombre = dto.Nombre;
             currentUser.Correo = dto.Correo;
             currentUser.Telefono = dto.Telefono;
             currentUser.IdRol = dto.IdRol;
-            currentUser.UrlFoto = dto.UrlFoto;
-            currentUser.NombreFoto = dto.NombreFoto;
             currentUser.Clave = dto.Clave;
             currentUser.EsActivo = dto.EsActivo;
+
+            if(!string.IsNullOrEmpty(dto.UrlFoto) && !string.IsNullOrEmpty(dto.NombreFoto))
+            {
+                currentUser.UrlFoto = dto.UrlFoto;
+                currentUser.NombreFoto = dto.NombreFoto;
+            }
 
             return await _repository.Update(currentUser);
         }

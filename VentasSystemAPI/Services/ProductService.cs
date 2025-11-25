@@ -53,35 +53,31 @@ namespace VentasSystemAPI.Services
 
         public async Task<Product> Update(ProductDto dto, int id)
         {
-            var entity = new Product
-            {
-                IdProducto = id,
-                CodigoBarra = dto.CodigoBarra,
-                Marca = dto.Marca,
-                Descripcion = dto.Descripcion,
-                IdCategoria = dto.IdCategoria,
-                Stock = dto.Stock,
-                Precio = dto.Precio,
-                EsActivo = dto.EsActivo,
-                FechaRegistro = DateTime.Now,
-                UnidadMedida = dto.UnidadMedida,
-                UnidadMedidaSat = dto.UnidadMedidaSat,
-                ClaveProductoSat = dto.ClaveProductoSat,
-                ObjetoImpuesto = dto.ObjetoImpuesto,
-                FactorImpuesto = dto.FactorImpuesto,
-                Impuesto = dto.Impuesto,
-                ValorImpuesto = dto.ValorImpuesto,
-                TipoImpuesto = dto.TipoImpuesto,
-                Descuento = dto.Descuento
-            };
+            var product = await Get(id);
+
+            product.Marca = dto.Marca;
+            product.Descripcion = dto.Descripcion;
+            product.IdCategoria = dto.IdCategoria;
+            product.Stock = dto.Stock;
+            product.Precio = dto.Precio;
+            product.EsActivo = dto.EsActivo;
+            product.UnidadMedida = dto.UnidadMedida;
+            product.UnidadMedidaSat = dto.UnidadMedidaSat;
+            product.ClaveProductoSat = dto.ClaveProductoSat;
+            product.ObjetoImpuesto = dto.ObjetoImpuesto;
+            product.FactorImpuesto = dto.FactorImpuesto;
+            product.Impuesto = dto.Impuesto;
+            product.ValorImpuesto = dto.ValorImpuesto;
+            product.TipoImpuesto = dto.TipoImpuesto;
+            product.Descuento = dto.Descuento;
 
             if (!string.IsNullOrEmpty(dto.UrlImagen) && !string.IsNullOrEmpty(dto.NombreImagen))
             {
-                entity.UrlImagen = dto.UrlImagen;
-                entity.NombreImagen = dto.NombreImagen;
+                product.UrlImagen = dto.UrlImagen;
+                product.NombreImagen = dto.NombreImagen;
             }
 
-            return await _repository.Update(entity);
+            return await _repository.Update(product);
         }
 
         public async Task<bool> Delete(int id)

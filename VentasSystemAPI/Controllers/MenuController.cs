@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using VentasSystemAPI.Data;
 using VentasSystemAPI.Dtos;
@@ -7,6 +8,7 @@ using VentasSystemAPI.Services;
 
 namespace VentasSystemAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class MenuController(ApiDbContext context, IUserService userService) : ControllerBase

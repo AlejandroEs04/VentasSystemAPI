@@ -13,7 +13,7 @@ using static VentasSystemAPI.Services.TimbradoService.TimbradoService;
 
 namespace VentasSystemAPI.Controllers
 {
-    [AllowAnonymous]
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class SaleController(
@@ -39,9 +39,14 @@ namespace VentasSystemAPI.Controllers
         private readonly TimpradoApiClient _timbradoApiClient = timbradoApiClient;
 
         [HttpGet]
-        public async Task<IActionResult> GetSales()
+        public async Task<IActionResult> GetSales(DateTime? startTime, DateTime? endTime)
         {
-            IEnumerable<Sale> sales = await _saleRepository.GetAll();
+            IEnumerable<SaleReportResponseDto> sales = await _context.SaleReports.ToListAsync();
+
+            if (startTime.HasValue) sales = sales.Where(s => s.FechaRegistro.Date >= startTime.Value.Date);
+
+            if (endTime.HasValue) sales = sales.Where(s => s.FechaRegistro.Date <= endTime.Value.Date);
+
             return Ok(sales);
         }
 
@@ -55,9 +60,9 @@ namespace VentasSystemAPI.Controllers
 
             if(month.HasValue) sales = sales.Where(s => s.FechaRegistro.Month == month);
 
-            if(startTime.HasValue) sales = sales.Where(s => s.FechaRegistro > startTime);
+            if(startTime.HasValue) sales = sales.Where(s => s.FechaRegistro >= startTime);
 
-            if(endTime.HasValue) sales = sales.Where(s => s.FechaRegistro < endTime);
+            if(endTime.HasValue) sales = sales.Where(s => s.FechaRegistro <= endTime);
 
             foreach (Sale sale in sales)
             {
@@ -93,6 +98,8 @@ namespace VentasSystemAPI.Controllers
             Sale sale = await _saleRepository.Get(id);
             IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(id);
 
+            var saleReport = await _context.SaleReports.FindAsync(id);
+
             SaleResponseDto saleResponse = new()
             {
                 Productos = [.. saleDetails],
@@ -105,7 +112,8 @@ namespace VentasSystemAPI.Controllers
                 Total = sale.Total,
                 FechaRegistro = sale.FechaRegistro,
                 IdCliente = sale.IdCliente,
-                Descuento = sale.Descuento
+                Descuento = sale.Descuento,
+                Report = saleReport ?? new()
             };
 
             return Ok(saleResponse);
@@ -190,6 +198,7 @@ namespace VentasSystemAPI.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpGet("Report/Download/{id}")]
         public async Task<IActionResult> GeneratePdf(int id)
         {
@@ -213,26 +222,45 @@ namespace VentasSystemAPI.Controllers
         [HttpGet("GenerateXml/{id}")]
         public async Task<IActionResult> GenerateXml(int id)
         {
-            Sale sale = await _saleRepository.Get(id);
-            IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(id);
-            Client client = await _clientService.Get(sale.IdCliente);
-
-            string xml = new FactureHelper(_context).GenerarXmlVenta(sale, client, [.. saleDetails]);
-
-            string zipBase64 = await _timbradoApiClient.TimbrarAsync(xml);
-
+            Console.WriteLine(id);
+            string fileName = "";
+            string? baseUrl = null;
+            string? urlDescarga = null;
             string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "facturas");
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
 
-            string fileName = $"Factura_{id}.zip";
-            string fullPath = Path.Combine(folderPath, fileName);
+            foreach(var file in Directory.GetFiles(folderPath))
+            {
+                var existsFileName = Path.GetFileName(file);
+                if (existsFileName.Contains($"Factura_{id}.zip"))
+                {
+                    fileName = existsFileName;
+                    baseUrl = $"{Request.Scheme}://{Request.Host}";
+                    urlDescarga = $"{baseUrl}/facturas/{existsFileName}";
+                }
+            }
 
-            var bytes = Convert.FromBase64String(zipBase64);
-            System.IO.File.WriteAllBytes(fullPath, bytes);
+            if (string.IsNullOrEmpty(baseUrl) && string.IsNullOrEmpty(urlDescarga))
+            {
+                Sale sale = await _saleRepository.Get(id);
+                IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(id);
+                Client client = await _clientService.Get(sale.IdCliente);
 
-            string baseUrl = $"{Request.Scheme}://{Request.Host}";
-            string urlDescarga = $"{baseUrl}/facturas/{fileName}";
+                string xml = new FactureHelper(_context).GenerarXmlVenta(sale, client, [.. saleDetails]);
+
+                string zipBase64 = await _timbradoApiClient.TimbrarAsync(xml);
+
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                fileName = $"Factura_{id}.zip";
+                string fullPath = Path.Combine(folderPath, fileName);
+
+                var bytes = Convert.FromBase64String(zipBase64);
+                System.IO.File.WriteAllBytes(fullPath, bytes);
+
+                baseUrl = $"{Request.Scheme}://{Request.Host}";
+                urlDescarga = $"{baseUrl}/facturas/{fileName}";
+            }
 
             return Ok(new
             {

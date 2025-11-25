@@ -12,7 +12,7 @@ namespace VentasSystemAPI.Data
             _http = http;
         }
 
-        public async Task<string> TimbrarAsync(string xml)
+        public async Task<string?> TimbrarAsync(string xml)
         {
             var content = new StringContent($"\"{xml}\"", Encoding.UTF8, "application/json");
 
@@ -28,7 +28,7 @@ namespace VentasSystemAPI.Data
                 await response.Content.ReadAsStringAsync()
             );
 
-            return (string)data;
+            return data as string;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
 
 namespace VentasSystemAPI.Data
@@ -23,6 +24,7 @@ namespace VentasSystemAPI.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<VW_ProductsSellers> ProductsSellers { get; set; }
         public DbSet<SaleDocumentType> DocumentTypes { get; set; }
+        public DbSet<SaleReportResponseDto> SaleReports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

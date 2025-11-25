@@ -15,5 +15,6 @@ namespace VentasSystemAPI.Dtos
         public int IdCliente { get; set; }
         public decimal Descuento { get; set; }
         public IEnumerable<SaleDetails> Productos { get; set; } = [];
+        public SaleReportResponseDto Report { get; set; }
     }
 }
