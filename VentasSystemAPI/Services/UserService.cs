@@ -46,6 +46,9 @@ namespace VentasSystemAPI.Services
             else
                 dto.Clave = _securityService.HashPassword(dto.Clave);
 
+            Console.WriteLine(dto.UrlFoto);
+            Console.WriteLine(dto.Nombre);
+
             currentUser.Nombre = dto.Nombre;
             currentUser.Correo = dto.Correo;
             currentUser.Telefono = dto.Telefono;

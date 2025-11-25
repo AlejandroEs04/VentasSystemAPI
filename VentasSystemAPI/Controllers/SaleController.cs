@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
 using VentasSystemAPI.Data;
 using VentasSystemAPI.Documents;
 using VentasSystemAPI.Dtos;
@@ -8,11 +9,11 @@ using VentasSystemAPI.Models;
 using VentasSystemAPI.Repositories;
 using VentasSystemAPI.Services;
 using VentasSystemAPI.Utils;
-using QuestPDF.Fluent;
+using static VentasSystemAPI.Services.TimbradoService.TimbradoService;
 
 namespace VentasSystemAPI.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [ApiController]
     [Route("Api/[controller]")]
     public class SaleController(
@@ -21,7 +22,10 @@ namespace VentasSystemAPI.Controllers
         IProductService product, 
         ICategoryService categoryRepository,
         IBusinessService businessRepository,
-        ApiDbContext context
+        IClientService clientService,
+        TimbradoClient _timbradoClient,
+        ApiDbContext context,
+        TimpradoApiClient timbradoApiClient
     ) : ControllerBase
     {
         private readonly ISaleService _saleRepository = saleRepository;
@@ -29,7 +33,10 @@ namespace VentasSystemAPI.Controllers
         private readonly IProductService _productRepository = product;
         private readonly ICategoryService _categoryRepository = categoryRepository;
         private readonly IBusinessService _businessRepository = businessRepository;
+        private readonly IClientService _clientService = clientService;
         private readonly ApiDbContext _context = context;
+        private readonly TimbradoClient _timbradoClient = _timbradoClient;
+        private readonly TimpradoApiClient _timbradoApiClient = timbradoApiClient;
 
         [HttpGet]
         public async Task<IActionResult> GetSales()
@@ -66,11 +73,14 @@ namespace VentasSystemAPI.Controllers
 
             int salesQuantity = sales.Count();
 
+            var productSales = await _context.ProductsSellers.ToListAsync();
+
             var response = new
             {
                 TotalAmount = totalAmount,
                 TotalQuantity = totalQuantity,
                 SalesQuantity = salesQuantity,
+                productSales,
                 sales
             };
 
@@ -116,14 +126,14 @@ namespace VentasSystemAPI.Controllers
                 Product currentProduct = await _productRepository.Get(detail.IdProducto);
                 discount += currentProduct.Descuento * detail.Cantidad;
                 subtotal += currentProduct.Precio * detail.Cantidad;
-                tax += (currentProduct.Precio * decimal.Parse(currentProduct.Impuesto) / 100) * detail.Cantidad;
+                tax += ((currentProduct.Precio - currentProduct.Descuento) * (currentProduct.ValorImpuesto / 100)) * detail.Cantidad;
             }
 
             SerialNumber serialNumber = await _context.SerialNumbers.FirstAsync();
 
             Sale newSale = new()
             {
-                NumeroVenta = (serialNumber.UltimoNumero + 1).ToString(),
+                NumeroVenta = (serialNumber.UltimoNumero + 1).ToString("D6"),
                 IdTipoDocumentoVenta = saleDto.IdTipoDocumentoVenta,
                 IdUsuario = int.Parse(userId),
                 SubTotal = subtotal,
@@ -133,6 +143,11 @@ namespace VentasSystemAPI.Controllers
                 IdCliente = saleDto.IdCliente,
                 Descuento = discount
             };
+
+            serialNumber.UltimoNumero += 1;
+
+            _context.SerialNumbers.Update(serialNumber);
+            await _context.SaveChangesAsync();
 
             Sale createdSale = await _saleRepository.Add(newSale);
 
@@ -194,5 +209,37 @@ namespace VentasSystemAPI.Controllers
 
             return File(pdfBytes, "application/pdf", $"venta_{id}.pdf");
         }
+
+        [HttpGet("GenerateXml/{id}")]
+        public async Task<IActionResult> GenerateXml(int id)
+        {
+            Sale sale = await _saleRepository.Get(id);
+            IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(id);
+            Client client = await _clientService.Get(sale.IdCliente);
+
+            string xml = new FactureHelper(_context).GenerarXmlVenta(sale, client, [.. saleDetails]);
+
+            string zipBase64 = await _timbradoApiClient.TimbrarAsync(xml);
+
+            string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "facturas");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string fileName = $"Factura_{id}.zip";
+            string fullPath = Path.Combine(folderPath, fileName);
+
+            var bytes = Convert.FromBase64String(zipBase64);
+            System.IO.File.WriteAllBytes(fullPath, bytes);
+
+            string baseUrl = $"{Request.Scheme}://{Request.Host}";
+            string urlDescarga = $"{baseUrl}/facturas/{fileName}";
+
+            return Ok(new
+            {
+                fileName,
+                url = urlDescarga
+            });
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using VentasSystemAPI.Dtos;
+﻿using Microsoft.VisualBasic;
+using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
 using VentasSystemAPI.Repositories;
 
@@ -17,7 +18,8 @@ namespace VentasSystemAPI.Services
                 Rfc = dto.Rfc,
                 FechaRegistro = DateTime.Now,
                 DomicilioFiscalReceptor = dto.DomicilioFiscalReceptor, 
-                RegimenFiscalReceptor = dto.RegimenFiscalReceptor
+                RegimenFiscalReceptor = dto.RegimenFiscalReceptor,
+                EsActivo = true
             };
 
             return await _repository.Add(entity);
@@ -35,17 +37,16 @@ namespace VentasSystemAPI.Services
 
         public async Task<Client> Update(int id, ClientUpdateDto dto)
         {
-            var entity = new Client
-            {
-                IdCliente = id,
-                Nombre = dto.Nombre,
-                Correo = dto.Correo,
-                Rfc = dto.Rfc,
-                EsActivo = dto.EsActivo,
-                DomicilioFiscalReceptor = dto.DomicilioFiscalReceptor,
-                RegimenFiscalReceptor = dto.RegimenFiscalReceptor,
-            };
-            return await _repository.Update(entity);
+            var clientExists = await Get(id);
+
+            clientExists.Nombre = dto.Nombre;
+            clientExists.Correo = dto.Correo;
+            clientExists.Rfc = dto.Rfc;
+            clientExists.EsActivo = dto.EsActivo;
+            clientExists.DomicilioFiscalReceptor = dto.DomicilioFiscalReceptor;
+            clientExists.RegimenFiscalReceptor = dto.RegimenFiscalReceptor;
+
+            return await _repository.Update(clientExists);
         }
 
         public async Task<bool> Delete(int id)

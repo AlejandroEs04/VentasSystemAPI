@@ -13,6 +13,16 @@ namespace VentasSystemAPI.Data
         public DbSet<SaleDetails> SaleDetails { get; set; }
         public DbSet<SerialNumber> SerialNumbers { get; set; }
         public DbSet<Business> Businesses { get; set; }
+        public DbSet<ClaveProdServ_SAT> ClaveProdServ_SAT { get; set; }
+        public DbSet<ClaveUnidad_SAT> ClaveUnidad_SAT { get; set; }
+        public DbSet<Impuesto_SAT> Impuesto_SAT { get; set; }
+        public DbSet<RegimenFiscal> RegimenFiscal { get; set; }
+        public DbSet<ObjetoImp_SAT> ObjetoImp_SAT { get; set; }
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<MenuRole> RoleMenus { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<VW_ProductsSellers> ProductsSellers { get; set; }
+        public DbSet<SaleDocumentType> DocumentTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -73,6 +73,7 @@ namespace VentasSystemAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto user)
         {
+            Console.WriteLine("Imagen " + user.UrlFoto);
             User? userExists = await _service.GetByEmail(user.Correo);
 
             if (userExists != null && userExists.IdUsuario != id)

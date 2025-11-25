@@ -32,12 +32,11 @@ namespace VentasSystemAPI.Services
 
         public async Task<Category> Update(CategoryDto dto, int id)
         {
-            var entity = new Category
-            {
-                IdCategoria = id, 
-                Descripcion = dto.Descripcion, 
-                EsActivo = dto.EsActivo
-            };
+            var entity = await Get(id);
+
+            entity.Descripcion = dto.Descripcion;
+            entity.EsActivo = dto.EsActivo;
+
             return await _repository.Update(entity);
         }
 

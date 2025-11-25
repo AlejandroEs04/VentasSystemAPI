@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://ws.urbansa.com/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://ws.urbansa.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ws.urbansa.com/">
+      <s:element name="TimbrarF">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Usuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="StrXml" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TimbrarFResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TimbrarFResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VerificarXML">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Usuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="StrXml" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="VerificarXMLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="VerificarXMLResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TimbrarCP">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Usuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Cadena" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TimbrarCPResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TimbrarCPResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TimbrarN2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Usuario" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Cadena" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TimbrarN2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TimbrarN2Result" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="TimbrarFSoapIn">
+    <wsdl:part name="parameters" element="tns:TimbrarF" />
+  </wsdl:message>
+  <wsdl:message name="TimbrarFSoapOut">
+    <wsdl:part name="parameters" element="tns:TimbrarFResponse" />
+  </wsdl:message>
+  <wsdl:message name="VerificarXMLSoapIn">
+    <wsdl:part name="parameters" element="tns:VerificarXML" />
+  </wsdl:message>
+  <wsdl:message name="VerificarXMLSoapOut">
+    <wsdl:part name="parameters" element="tns:VerificarXMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="TimbrarCPSoapIn">
+    <wsdl:part name="parameters" element="tns:TimbrarCP" />
+  </wsdl:message>
+  <wsdl:message name="TimbrarCPSoapOut">
+    <wsdl:part name="parameters" element="tns:TimbrarCPResponse" />
+  </wsdl:message>
+  <wsdl:message name="TimbrarN2SoapIn">
+    <wsdl:part name="parameters" element="tns:TimbrarN2" />
+  </wsdl:message>
+  <wsdl:message name="TimbrarN2SoapOut">
+    <wsdl:part name="parameters" element="tns:TimbrarN2Response" />
+  </wsdl:message>
+  <wsdl:portType name="TimbradoSoap">
+    <wsdl:operation name="TimbrarF">
+      <wsdl:input message="tns:TimbrarFSoapIn" />
+      <wsdl:output message="tns:TimbrarFSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="VerificarXML">
+      <wsdl:input message="tns:VerificarXMLSoapIn" />
+      <wsdl:output message="tns:VerificarXMLSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarCP">
+      <wsdl:input message="tns:TimbrarCPSoapIn" />
+      <wsdl:output message="tns:TimbrarCPSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarN2">
+      <wsdl:input message="tns:TimbrarN2SoapIn" />
+      <wsdl:output message="tns:TimbrarN2SoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TimbradoSoap" type="tns:TimbradoSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TimbrarF">
+      <soap:operation soapAction="http://ws.urbansa.com/TimbrarF" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VerificarXML">
+      <soap:operation soapAction="http://ws.urbansa.com/VerificarXML" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarCP">
+      <soap:operation soapAction="http://ws.urbansa.com/TimbrarCP" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarN2">
+      <soap:operation soapAction="http://ws.urbansa.com/TimbrarN2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TimbradoSoap12" type="tns:TimbradoSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TimbrarF">
+      <soap12:operation soapAction="http://ws.urbansa.com/TimbrarF" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="VerificarXML">
+      <soap12:operation soapAction="http://ws.urbansa.com/VerificarXML" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarCP">
+      <soap12:operation soapAction="http://ws.urbansa.com/TimbrarCP" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TimbrarN2">
+      <soap12:operation soapAction="http://ws.urbansa.com/TimbrarN2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Timbrado">
+    <wsdl:port name="TimbradoSoap" binding="tns:TimbradoSoap">
+      <soap:address location="https://ws.urbansa.com/app/timbrado.asmx" />
+    </wsdl:port>
+    <wsdl:port name="TimbradoSoap12" binding="tns:TimbradoSoap12">
+      <soap12:address location="https://ws.urbansa.com/app/timbrado.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

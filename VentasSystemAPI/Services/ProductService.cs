@@ -65,7 +65,7 @@ namespace VentasSystemAPI.Services
                 EsActivo = dto.EsActivo,
                 FechaRegistro = DateTime.Now,
                 UnidadMedida = dto.UnidadMedida,
-                UnidadMedidaSat = dto.UnidadMedida,
+                UnidadMedidaSat = dto.UnidadMedidaSat,
                 ClaveProductoSat = dto.ClaveProductoSat,
                 ObjetoImpuesto = dto.ObjetoImpuesto,
                 FactorImpuesto = dto.FactorImpuesto,

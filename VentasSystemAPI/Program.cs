@@ -7,6 +7,7 @@ using VentasSystemAPI.Data;
 using VentasSystemAPI.Repositories;
 using VentasSystemAPI.Services;
 using VentasSystemAPI.Utils;
+using static VentasSystemAPI.Services.TimbradoService.TimbradoService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,9 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+builder.Services.AddHttpClient<TimbradoClient>();
+builder.Services.AddHttpClient<TimpradoApiClient>();
 
 builder.Services.AddCors((options) => {
     // Development enviroment cors origin
