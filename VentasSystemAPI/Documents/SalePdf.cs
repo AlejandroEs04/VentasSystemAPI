@@ -1,4 +1,5 @@
 ﻿using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using VentasSystemAPI.Dtos;
 using VentasSystemAPI.Models;
@@ -24,70 +25,114 @@ namespace VentasSystemAPI.Documents
             container.Page(page =>
             {
                 page.Margin(20);
+                page.Size(PageSizes.A4);
 
-                // ENCABEZADO
-                page.Header().Row(row =>
+                // ====== HEADER ======
+                page.Header().PaddingBottom(10).Column(col =>
                 {
-                    row.RelativeItem().Column(col =>
+                    col.Item().Row(row =>
                     {
-                        col.Item().Text(_model.Business.Nombre.ToUpper()).Bold();
-                        col.Item().Text($"Dirección: {_model.Business.Direccion}");
-                        col.Item().Text($"Correo: {_model.Business.Correo}");
-                    });
+                        // Logo
+                        var logoPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "uploaded", _model.Business.NombreLogo);
+                        if (File.Exists(logoPath))
+                        {
+                            row.RelativeItem().Width(120).Height(120)
+                                .Image(logoPath, ImageScaling.FitArea);
+                        }
 
-                    row.RelativeItem().AlignRight().Column(col =>
-                    {
-                        col.Item().Text("NÚMERO VENTA").Bold().FontSize(14);
-                        col.Item().Text(_model.Sale.NumeroVenta.ToString());
+                        // Número Venta
+                        row.RelativeItem().AlignRight().Column(rightCol =>
+                        {
+                            rightCol.Item().Text("NÚMERO VENTA")
+                                .Bold().FontColor("#03A99F").FontSize(18);
+
+                            rightCol.Item().Text(_model.Sale.NumeroVenta.ToString())
+                                .Bold().FontSize(14);
+                        });
                     });
                 });
 
                 page.Content().Column(col =>
                 {
-                    col.Spacing(10);
+                    col.Item().Row(row =>
+                    {
+                        // Negocio
+                        row.RelativeItem().Column(business =>
+                        {
+                            business.Item().Text(_model.Business.Nombre.ToUpper()).Bold().FontSize(14);
+                            business.Item().Text($"Dirección: {_model.Business.Direccion}")
+                                    .FontColor("#858585").FontSize(12);
+                            business.Item().Text($"Correo: {_model.Business.Correo}")
+                                    .FontColor("#858585").FontSize(12);
+                        });
 
-                    // TABLA DE PRODUCTOS
+                        // Cliente
+                        row.RelativeItem().AlignRight().Column(client =>
+                        {
+                            client.Item().Text("CLIENTE").Bold().FontSize(13);
+                            client.Item().Text(_model.Client.Nombre).FontColor("#858585");
+                            client.Item().Text(_model.Client.Rfc).FontColor("#858585");
+                        });
+                    });
+
+                    col.Spacing(200);
+
                     col.Item().Table(table =>
                     {
                         table.ColumnsDefinition(column =>
                         {
                             column.RelativeColumn();
-                            column.ConstantColumn(80);
-                            column.ConstantColumn(80);
-                            column.ConstantColumn(80);
+                            column.ConstantColumn(100);
+                            column.ConstantColumn(100);
+                            column.ConstantColumn(100);
                         });
 
-                        // HEADER
+                        // Header
                         table.Header(header =>
                         {
-                            header.Cell().Element(CellStyle).Text("Producto");
-                            header.Cell().Element(CellStyle).Text("Cantidad");
-                            header.Cell().Element(CellStyle).Text("Precio");
-                            header.Cell().Element(CellStyle).Text("Total");
+                            header.Cell().Element(ThStyle).Text("Producto");
+                            header.Cell().Element(ThStyle).Text("Cantidad");
+                            header.Cell().Element(ThStyle).Text("Precio");
+                            header.Cell().Element(ThStyle).Text("Total");
                         });
 
-                        // FILAS DINÁMICAS
+                        // Filas
                         foreach (var item in _model.SaleDetails)
                         {
-                            table.Cell().Text(item.DescripcionProducto);
-                            table.Cell().Text(item.Cantidad.ToString());
-                            table.Cell().Text($"{_model.Business.SimboloMoneda} {item.Precio}");
-                            table.Cell().Text($"{_model.Business.SimboloMoneda} {item.Total}");
+                            table.Cell().Element(TdStyleNormal).Text(item.DescripcionProducto);
+                            table.Cell().Element(TdStyleNormal).Text(item.Cantidad.ToString());
+                            table.Cell().Element(TdStyleNormal).Text($"{_model.Business.SimboloMoneda} {item.Precio}");
+                            table.Cell().Element(TdStyleTotal).Text($"{_model.Business.SimboloMoneda} {item.Total}");
                         }
                     });
 
-                    // TOTALES
+                    col.Spacing(10);
+
+                    // ====== TOTALES ======
                     col.Item().AlignRight().Column(totals =>
                     {
-                        totals.Item().Text($"Sub Total: {_model.Business.SimboloMoneda} {_model.Sale.SubTotal}").Bold();
-                        totals.Item().Text($"IGV: {_model.Business.SimboloMoneda} {_model.Sale.ImpuestoTotal}").Bold();
-                        totals.Item().Text($"Total: {_model.Business.SimboloMoneda} {_model.Sale.Total}").Bold().FontSize(14);
+                        totals.Item().Text($"Sub Total: {_model.Business.SimboloMoneda} {_model.Sale.SubTotal}")
+                                .Bold().FontSize(13);
+                        totals.Item().Text($"IGV: {_model.Business.SimboloMoneda} {_model.Sale.ImpuestoTotal}")
+                                .Bold().FontSize(13);
+                        totals.Item().Text($"Total: {_model.Business.SimboloMoneda} {_model.Sale.Total}")
+                                .Bold().FontSize(16).FontColor("#03A99F");
                     });
                 });
             });
         }
 
-        private static IContainer CellStyle(IContainer container) =>
-            container.Background("#03A99F").Padding(5).DefaultTextStyle(x => x.FontColor("#FFFFFF"));
+        // ====== ESTILOS ======
+        private static IContainer ThStyle(IContainer container) =>
+            container.Background("#03A99F").Padding(10)
+                    .DefaultTextStyle(x => x.FontColor("#FFFFFF").FontSize(14).Bold());
+
+        private static IContainer TdStyleNormal(IContainer container) =>
+            container.BorderBottom(1).BorderColor("#E8E8E8")
+                    .Padding(8).DefaultTextStyle(x => x.FontColor("#757575"));
+
+        private static IContainer TdStyleTotal(IContainer container) =>
+            container.Background("#EDF6F9").Padding(8)
+                    .DefaultTextStyle(x => x.FontColor("#757575"));
     }
 }

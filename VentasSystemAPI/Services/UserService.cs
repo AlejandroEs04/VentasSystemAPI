@@ -62,6 +62,13 @@ namespace VentasSystemAPI.Services
             return await _repository.Update(currentUser);
         }
 
+        public async Task<bool> UpdatePassword(User user)
+        {
+            user.Clave = _securityService.HashPassword(user.Clave);
+            
+            return await _repository.Update(user) is not null;
+        }
+
         public async Task<bool> Delete(int id)
         {
             return await _repository.Delete(id);

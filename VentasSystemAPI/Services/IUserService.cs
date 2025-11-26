@@ -9,6 +9,7 @@ namespace VentasSystemAPI.Services
         Task<User> Get(int id);
         Task<User> Add(UserCreateDto user);
         Task<User> Update(UserUpdateDto user, int id);
+        Task<bool> UpdatePassword(User user);
         Task<bool> Delete(int id);
         Task<User> GetByCredentials(string correo, string clave);
         Task<User?> GetByEmail(string correo);

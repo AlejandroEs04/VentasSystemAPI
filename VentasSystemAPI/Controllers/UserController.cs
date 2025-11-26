@@ -73,7 +73,6 @@ namespace VentasSystemAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto user)
         {
-            Console.WriteLine("Imagen " + user.UrlFoto);
             User? userExists = await _service.GetByEmail(user.Correo);
 
             if (userExists != null && userExists.IdUsuario != id)
@@ -93,6 +92,26 @@ namespace VentasSystemAPI.Controllers
             );
 
             return Ok(updatedUser);
+        }
+
+        [HttpPut("ChangePassword/{id}")]
+        public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto changePassword)
+        {
+            if (changePassword.NuevaClave != changePassword.NuevaClaveRepetida)
+                return BadRequest("Las contraseñas no coinciden");
+
+            User? userExists = await _service.Get(id);
+
+            if (await _service.GetByCredentials(userExists.Correo, changePassword.ClaveActual) is null)
+                return Unauthorized("La contraseña actual no es correcta");
+
+            if (userExists is null)
+                return BadRequest("Usuario no existe");
+
+            userExists.Clave = changePassword.NuevaClave;
+
+            await _service.UpdatePassword(userExists);
+            return Ok();
         }
 
         [HttpDelete("{id}")]

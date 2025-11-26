@@ -205,12 +205,14 @@ namespace VentasSystemAPI.Controllers
             Sale sale = await _saleRepository.Get(id);
             IEnumerable<SaleDetails> saleDetails = _saleDetailRepository.GetBySale(id);
             Business business = await _businessRepository.GetBusiness();
+            Client client = await _clientService.Get(sale.IdCliente);
 
             SaleReportDto saleReport = new()
             {
                 Sale = sale,
                 SaleDetails = saleDetails,
-                Business = business
+                Business = business,
+                Client = client
             };
 
             var document = new SalePdf(saleReport);

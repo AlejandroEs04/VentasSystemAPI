@@ -7,5 +7,6 @@ namespace VentasSystemAPI.Dtos
         public Sale Sale { get; set; } = new Sale();
         public IEnumerable<SaleDetails> SaleDetails { get; set; } = [];
         public Business Business { get; set; } = new Business();
+        public Client Client { get; set; } = new Client();
     }
 }
